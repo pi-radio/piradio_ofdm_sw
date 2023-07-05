@@ -1,4 +1,4 @@
-insmod files/piradio0.ko &&
+insmod driver/piradio0.ko &&
 ip link set piradio00 mtu 8000 &&
 ip link set piradio01 mtu 8000 &&
 ip link set piradio00 up &&
