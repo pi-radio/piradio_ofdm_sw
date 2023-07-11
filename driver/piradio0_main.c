@@ -56,6 +56,10 @@
 MODULE_LICENSE("Dual BSD/GPL");
 
 struct net_device * netdevg;
+int project_type;
+
+module_param(project_type, int, S_IRUSR | S_IWUSR);
+MODULE_PARM_DESC(project_type, "Indicate type of project: 0 fir standalone, 1 for loopback");
 
 static int piradio0_change_mtu(struct net_device *dev, int new_mtu){
 	if (netif_running(dev))
@@ -268,13 +272,12 @@ int piradio0_open(struct net_device *dev)
 	netdev_dbg(dev, "Will Allocate RX BDs");
 	piradio_dma_alloc_rx_bds(&priv->rx_dma,
 			dev);
-
 	if(priv->main_iface){ 
 		memcpy(dev->dev_addr, "PIRAD0", PIRADIO_HW_ALEN);
 		ret = request_irq(priv->config_framer_dma.irq, tx_config_cmplt_callback, // TODO
-						  0, dev->name, dev);
+						0, dev->name, dev);
 		ret = request_irq(priv->config_correlator_dma.irq, tx_config_cmplt_callback, // TODO
-						  0, dev->name, dev);
+						0, dev->name, dev);
 		netdev_dbg(dev, "Will Allocate TX BDs");
 		piradio_dma_alloc_tx_bds(&priv->config_framer_dma, priv->tx_bd_config_num,
 			dev);
@@ -340,6 +343,7 @@ int piradio0_open(struct net_device *dev)
 	priv->tx_workqueue = create_workqueue("tx_workqueue");
 	priv->tx_workqueue_item = kmalloc(sizeof(struct tx_wq_item), GFP_ATOMIC);
 	INIT_WORK(&priv->tx_workqueue_item->work, tx_workqueue_fn);
+	priv->project_type = (project_t)project_type;
 
 	return 0;
 }
@@ -501,7 +505,7 @@ static int piradio0_probe(struct platform_device *pdev)
 	piradio_reg_probe(pdev, &priv->fec_rx_ctrl_base, "fec_rx_reg", 1);
 	piradio_reg_probe(pdev, &priv->rx_tlast_frame_len, "tlast_reg", 0);
 	
-	piradio_reg_probe(pdev, &priv->mem_reg_base,"log_reg", 0);
+	//piradio_reg_probe(pdev, &priv->mem_reg_base,"log_reg", 0);
 	// piradio_ifft_reg_probe(pdev, &priv->ifft_reg_base);
 	priv->dev = &pdev->dev;
 	priv->pdev = pdev;
@@ -546,7 +550,11 @@ static struct platform_driver piradio0_driver =
 
 static int __init piradio0_init(void)
 {
-	printk(KERN_ALERT "Hello World1\n");
+	if(project_type)
+		printk(KERN_ALERT "Hello World for loopback project\n");
+	else	
+		printk(KERN_ALERT "Hello World for standalone project\n");
+	
 	return platform_driver_register(&piradio0_driver);
 }
 

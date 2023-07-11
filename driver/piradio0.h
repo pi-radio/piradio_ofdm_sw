@@ -230,6 +230,11 @@ struct tx_state{
 };
 
 typedef enum{
+	PROJECT_STANDALONE           = 0,
+	PROJECT_LOOPBACK      		 = 1
+}project_t;
+
+typedef enum{
 	PIRADIO_CONFIG_MOD        = SIOCDEVPRIVATE + 1,
 	PIRADIO_CONFIG_FRAMER     = SIOCDEVPRIVATE + 2,
 	PIRADIO_CONFIG_CORRELATOR = SIOCDEVPRIVATE + 3,
@@ -312,6 +317,7 @@ struct piradio_priv {
 	struct stats link_stats;
 	struct sk_buff *last_skb;
 	mod_t modulation;
+	project_t project_type;
 	struct dma_async_tx_descriptor *chan_desc;
 	__u32 sequence_num;
 

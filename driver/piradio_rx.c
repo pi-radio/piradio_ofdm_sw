@@ -20,13 +20,15 @@ int prepare_skb(uint8_t *rx_buffer, size_t len,
 	struct iphdr *ip_header;
 	ip_header = (struct iphdr *)&rx_buffer[ETH_HLEN];
 	if (ip_header->ihl == 5 && ip_header->version == 4) {
-	ip_header->daddr ^=
-		0x00010000; /*Flip last bit of network address to fool the OS*/
-	ip_header->saddr ^=
-		0x00010000; /*Flip last bit of host address to fool the OS*/
-	ip_header->check = 0;
-	ip_header->check =
-		ip_fast_csum((u8 *)ip_header, ip_header->ihl);
+	if(priv->project_type){
+		ip_header->daddr ^=
+			0x00010000; /*Flip last bit of network address to fool the OS*/
+		ip_header->saddr ^=
+			0x00010000; /*Flip last bit of host address to fool the OS*/
+		ip_header->check = 0;
+		ip_header->check =
+			ip_fast_csum((u8 *)ip_header, ip_header->ihl);
+	}
 	memcpy(skb->data, rx_buffer, len);
 	skb->protocol = eth_type_trans(skb, netdev);
 	skb->ip_summed = CHECKSUM_UNNECESSARY;
