@@ -72,7 +72,7 @@ static int piradio0_change_mtu(struct net_device *dev, int new_mtu){
 }
 
 char test[8192];
-static int piradio0_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
+static int piradio0_ioctl(struct net_device *dev, struct ifreq *rq, void __user *data,int cmd)
 {
 	netdev_dbg(dev, "IOCTL called");
 	struct piradio_priv* priv = netdev_priv(dev);
@@ -430,7 +430,7 @@ static const struct net_device_ops piradio0_ops = {
 	.ndo_stop = piradio0_down,
 	.ndo_init = piradio0_dev_init,
 	.ndo_start_xmit = piradio0_tx,
-	.ndo_do_ioctl = piradio0_ioctl,
+	.ndo_siocdevprivate = piradio0_ioctl,
 	.ndo_get_stats64 = piradio0_stats,
 	.ndo_change_mtu = piradio0_change_mtu,
 };
