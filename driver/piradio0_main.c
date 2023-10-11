@@ -99,7 +99,7 @@ static int piradio0_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 				write_reg(MOD_BPSK, priv->mod_rx_base);
 			memcpy(priv->modulation_buf, &priv->modulation, sizeof(uint32_t));
 			
-			write_reg((priv->fec_struct.block_data_len * priv->modulation) / 32, 
+			write_reg((priv->fec_struct.block_data_len * priv->modulation) / 128, 
 						priv->rx_tlast_frame_len);
 			
 			piradio_dma_dealloc_tx_bds(&priv->tx_dma, priv->tx_bd_num, 
